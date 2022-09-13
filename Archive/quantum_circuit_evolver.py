@@ -1,4 +1,8 @@
-# Written by Sebastian T. Overskott Jan. 2022. Github link: https://github.com/Overskott/Evolving-quantum-circuits
+#    Copyright ""Bhandari, S., Overskott, S., Adamopoulos, I., Lind, P.G., Denysov,
+#    S., Nichele, S. (2022). Evolving Quantum Circuits to Implement Stochastic and 
+#    Deterministic Cellular Automata Rules. In: Chopard, B., Bandini, S., Dennunzio, A.,
+#    Arabi Haddad, M. (eds) Cellular Automata. ACRI 2022. Lecture Notes in Computer 
+#    Science, vol 13402. Springer, Cham. https://doi.org/10.1007/978-3-031-14926-9_11""
 
 import copy
 import math

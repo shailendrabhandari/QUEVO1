@@ -1,5 +1,10 @@
-#  Copyright 2022 Sebastian T. Overskott Github link: https://github.com/Overskott/Quevo
-#
+# Copyright ""Bhandari, S., Overskott, S., Adamopoulos, I., Lind, P.G., Denysov,
+#    S., Nichele, S. (2022). Evolving Quantum Circuits to Implement Stochastic and 
+#    Deterministic Cellular Automata Rules. In: Chopard, B., Bandini, S., Dennunzio, A.,
+#    Arabi Haddad, M. (eds) Cellular Automata. ACRI 2022. Lecture Notes in Computer 
+#    Science, vol 13402. Springer, Cham. https://doi.org/10.1007/978-3-031-14926-9_11""
+
+
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
 #    You may obtain a copy of the License at
