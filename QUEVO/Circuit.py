@@ -37,18 +37,15 @@ class Circuit(object):
         ----------
         chromosome: (Chromosome)
             The chromosome that describes the QuantumCircuit.
-        """
+         """
+        n_qubits = 3
+        n_states = 8        
         self.chromosome = chromosome
-        self._circuit = QuantumCircuit(3, 1) #three qubits and 1 classical bit
+        self._circuit = QuantumCircuit(n_qubits, 1) #three qubits and 1 classical bit
         self._SHOTS = 2048
-        self._STARTING_STATES = [[0, 0, 0],
-                                 [0, 0, 1],
-                                 [0, 1, 0],
-                                 [0, 1, 1],
-                                 [1, 0, 0],
-                                 [1, 0, 1],
-                                 [1, 1, 0],
-                                 [1, 1, 1]]
+
+  
+        self._STARTING_STATES = np.random.rand(n_states, 2**n_qubits)
         self.results = {}
 
 
@@ -70,12 +67,12 @@ class Circuit(object):
 	 adds the chosen gate to the circuit. Finally, it adds a measurement gate to the first
 	 qubit and outputs qubit 0.
         """
-        gates = int(self.chromosome.get_length() / 3)
-
+        n_qubits = 3
+        gates = int(self.chromosome.get_length() / n_qubits)
         gate_dict = self.chromosome.get_gate_dict()
 
         for i in range(0, gates):
-            gate_index = i * 3
+            gate_index = i * n_qubits
 
             a = self.chromosome.get_integer_list()[gate_index]
             b = self.chromosome.get_integer_list()[gate_index + 1]
@@ -127,13 +124,14 @@ class Circuit(object):
         MW_entanglement : float
             Mayer-Wallach entanglement value for the input ket
         """
-        ket = qutip.Qobj(ket, dims=[[2]*(3), [2]*(3)]).unit()
+        n_qubits = 3
+        ket = qutip.Qobj(ket, dims=[[2]*(n_qubits), [2]*(n_qubits)]).unit()
         entanglement_sum = 2
-        for k in range(3):
+        for k in range(n_qubits):
             rho_k_sq = ket.ptrace([k])**2
             entanglement_sum += rho_k_sq.tr()
    
-        MW_entanglement = 2*(1 - (1/3)*entanglement_sum)
+        MW_entanglement = 2*(1 - (1/n_qubits)*entanglement_sum)
         return MW_entanglement
 
     def find_chromosome_fitness(self, state: List[int]) -> float:
@@ -158,7 +156,7 @@ class Circuit(object):
         fitness = 0
         MW_entanglement = self.compute_MW_entanglement(ket=state)
         print('MW_entanglement = {}\n'.format(MW_entanglement))
-        fitness = 0 + MW_entanglement
+        fitness = fitness + MW_entanglement
         return fitness
  
     '''@staticmethod
