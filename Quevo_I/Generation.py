@@ -1,3 +1,25 @@
+<<<<<<< HEAD:Quevo_I/Generation.py
+=======
+# Copyright ""Bhandari, S., Overskott, S., Adamopoulos, I., Lind, P.G., Denysov,
+#    S., Nichele, S. (2022). Evolving Quantum Circuits to Implement Stochastic and 
+#    Deterministic Cellular Automata Rules. In: Chopard, B., Bandini, S., Dennunzio, A.,
+#    Arabi Haddad, M. (eds) Cellular Automata. ACRI 2022. Lecture Notes in Computer 
+#    Science, vol 13402. Springer, Cham. https://doi.org/10.1007/978-3-031-14926-9_11""
+
+
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+>>>>>>> 891ee0dd89a3892d30bc971a8419d0f6f6989722:Quevo/Generation.py
 import copy
 import math
 import random
