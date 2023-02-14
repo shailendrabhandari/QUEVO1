@@ -66,7 +66,7 @@ If you want to learn more in detail about all the functions, please read the doc
 ## Technologies
 Project is created with:
 * Python version: 3.8 
-* Qiskit version: 0.34.1
+* Qiskit version: qiskit-0.41.0 qiskit-aer-0.11.2 qiskit-ibmq-provider-0.20.0 qiskit-terra-0.23.1 rustworkx-0.12.1 stevedore-5.0.0 symengine-0.9.2
 * scipy.special: 1.7.1
 
 
