@@ -1,17 +1,3 @@
-#  Copyright 2022 Sebastian T. Overskott Github link: https://github.com/Overskott/Quevo
-#
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
-#
-#        http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
-
 import copy
 import math
 import random
@@ -108,9 +94,9 @@ class Generation(object):
         """
         fitness_sum = 0
         for parent in self._parent_list:
-            fitness_sum = fitness_sum + parent.get_fitness_score()
+            fitness_sum = fitness_sum + parent.get_fitness_score() 
 
-        if math.isinf(fitness_sum):  # KL-fitness might give inf as fitness
+        if math.isinf(fitness_sum):  
             fitness_sum = 100
 
         selection_list = []
@@ -148,7 +134,7 @@ class Generation(object):
                 return copy.deepcopy(parent)
             index = index + 1
 
-    def run_generation_diff(self, desired_outcome: List[float]) -> None:
+    def run_generation(self, desired_entanglement: List[float]) -> None:
         """
         Runs the simulator for all the chromosomes in the generation and
         stores the fitness for each chromosome in fitness_list.
@@ -156,35 +142,22 @@ class Generation(object):
         Parameters
         ----------
         desired_outcome (List[float]):
-            A list of the eight CA outcomes we wish to test the chromosomes against.
+            A list of the eightentanglement measure we wish to test the chromosomes against.
         """
 
         for chromosome in self._chromosome_list:
             circuit = Circuit(chromosome)
-            chromosome_fitness = abs(circuit.find_chromosome_fitness(desired_outcome))
+            ##chromosome_fitness = abs(circuit.find_chromosome_fitness(desired_entanglement))   ##original
+            chromosome_fitness = abs(circuit.find_chromosome_fitness(desired_entanglement))
             chromosome.set_fitness_score(chromosome_fitness)
 
-    def run_generation_kl(self, desired_outcome: List[float]) -> None:
-        """
-        Runs the simulator for all the chromosomes in the generation and
-        stores the fitness for each chromosome in fitness_list.
 
-        Parameters
-        ----------
-        desired_outcome (List[float]):
-            A list of the eight CA outcomes we wish to test the chromosomes against.
-        """
-
-        for chromosome in self._chromosome_list:
-            circuit = Circuit(chromosome)
-            chromosome_fitness = abs(circuit.find_kullback_liebler_fitness(desired_outcome))
-            chromosome.set_fitness_score(chromosome_fitness)
 
     def get_best_fitness(self):
         """Returns the fitness value for the best chromosome in the generation."""
         best_fitness = 10
         for chromosome in self._chromosome_list:
-            chromosome_fitness = chromosome.get_fitness_score()
+            chromosome_fitness = chromosome.get_fitness_score() 
             if best_fitness > chromosome_fitness:
                 best_fitness = chromosome_fitness
 
@@ -237,3 +210,7 @@ class Generation(object):
         for chromosome in self._chromosome_list:
             print(chromosome.get_fitness_score())
         print("\n")
+
+
+
+
