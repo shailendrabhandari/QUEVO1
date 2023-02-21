@@ -1,6 +1,6 @@
 # QUEVO1
 
-This code is created for a pilot project done through the [NordSTAR](https://www.oslomet.no/nordstar) research group at Oslo Metropolitan university. It generates simulated quantum circuits to fit a desired probability outcome for eight initial conditions. 
+This code was originally created for a pilot project conducted by the [NordSTAR](https://www.oslomet.no/nordstar) research group at Oslo Metropolitan University. Its main purpose was to generate simulated quantum circuits to achieve a desired probability outcome for eight initial conditions. However, it has been further modified to include the measurement of entanglement in the generated quantum circuits using MW-measure of entanglement methods.
 
 ## Table of contents
 * [General info](#general-info)
