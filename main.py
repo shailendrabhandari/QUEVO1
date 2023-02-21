@@ -6,12 +6,11 @@ if __name__ == '__main__':
     #mutation_prob = 10
     n_qubits = 3
     n_states = 8
-    number_of_runs = 1
+    number_of_runs = 10
     gates = 10
-    chromosomes = 10
+    chromosomes = 20
     generations = 10
     gate_types = ['cx', 'x', 'h', 'rxx', 'rzz', 'swap', 'z', 'y', 'toffoli']
-    #states = [1, 1, 1, 1, 1, 1, 1, 1]
     states = np.random.rand(n_states, 2**n_qubits)
     #states = list(itertools.product(qubit_states, repeat=3))
     '''For n_states = 8 and n_qubits = 3, the above code will create
@@ -72,14 +71,16 @@ if __name__ == '__main__':
             print("------------------------------------------------------------------------------")
             print("\n")
 
-        if current_fitness < 0.01:
+        if current_fitness < 0.0001:
             break
     print("Best fitness for the circuit: " + str(final_fitness))
     print("Best chromosome : " + str(best_chromosome))
 
-    circuit = Quevo.Circuit(best_chromosome)
-    print("\n")
-
+# Print the best circuit and its fitness
+    best_fitness = generation.get_best_fitness()
+    best_chromosome = generation.get_best_chromosome()
+    print("Best fitness for generation", gen+1, ":", best_fitness)
+    circuit = QUEVO.Circuit(best_chromosome)
     circuit.generate_circuit()
     circuit.draw()
 
