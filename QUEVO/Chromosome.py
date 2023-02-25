@@ -63,7 +63,10 @@ class Chromosome(object):
         self._length: int = 0
         self._gate_types = gate_types
         self._gate_dict: dict = self._create_gate_dict()
+        self._fitness_score = None
 
+    def set_fitness_score(self, fitness_score):
+        self._fitness_score = fitness_score + np.random.uniform(0, 0.0001)
     def __repr__(self) -> str:
         """Returns desired for printing == print(_integer_list)"""
         return str(self._integer_list)
@@ -227,7 +230,7 @@ class Chromosome(object):
         self._fix_duplicate_qubit_assignment()
         self._generate_theta_list()
 
-    def mutate_chromosome(self, probability: int) -> None:
+    def mutate_chromosome(self, probability: float) -> 'Chromosome':
         """
         Mutates the chromosome. Mutation can be of either replacing a gates from the pool of gates in the chromosome
         with a randomly generated new one, or replacing the chromosome so as to generate the best four best parents.
@@ -235,19 +238,27 @@ class Chromosome(object):
 
         Parameters
         ----------
-        probability : (int) optional
-            Value Between 0 and 100. The probability of replacing a gate.
-            The probability of replacing the whole chromosome is 1-probability
+        probability : (float) optional
+            Value between 0 and 1. The probability of replacing a gate.
+            The probability of replacing the whole chromosome is 1-probability.
+
+        Returns
+        -------
+        mutated_chromosome : (Chromosome)
+            The mutated chromosome.
         """
 
         old_integer_list = copy.copy(self._integer_list)
 
-        if random.randrange(0, 100) <= probability:
+        if random.random() < probability:
             self._replace_gate_with_random_gate()
         else:
             self._change_qubit_connections()
         self._fix_duplicate_qubit_assignment()
         self._update_theta_list(old_integer_list, self._integer_list)
+
+        mutated_chromosome = copy.deepcopy(self)
+        return mutated_chromosome
 
     def _replace_gate_with_random_gate(self) -> None:
         """

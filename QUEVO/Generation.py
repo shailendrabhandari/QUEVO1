@@ -25,7 +25,7 @@ class Generation(object):
         Number of gates in each chromosome.
     """
 
-    def __init__(self, chromosomes: int, gates: int) -> None:
+    def __init__(self, chromosomes: int, gates: int, mutation_rate: float) -> None:
         """
         The Generation constructor.
 
@@ -40,6 +40,17 @@ class Generation(object):
         self._parent_list: List[Chromosome] = []
         self._chromosomes: int = chromosomes
         self._gates: int = gates
+        self.mutation_rate: float = mutation_rate
+
+
+
+        self._chromosome_list = []
+        self._parent_chromosomes = []
+        self._circuit_list = []  # added line
+        self._circuit_fitness_list = []  # added line
+        self._mutation_rate = mutation_rate
+        self._best_fitness = None
+        self._best_chromosome = None
 
     def create_initial_generation(self, gate_types: List[str]) -> None:
         """
@@ -50,10 +61,12 @@ class Generation(object):
             chromosome = Chromosome(gate_types)
             chromosome.generate_random_chromosome(self._gates)
             self._chromosome_list.append(chromosome)
+        # Print the generated chromosomes
+        print("Initial Generation Parents:")
+        for chromosome in self._chromosome_list:
+            print(chromosome)
 
-
-
-    def evolve_into_next_generation(self, probability=30):
+    def evolve_into_next_generation(self, probability=0):
         """
         Changes the chromosomes in the generation by "evolving" them is this manner:
         The four best chromosomes are left unchanged as "elites". the rest of the chromosomes are
@@ -65,25 +78,29 @@ class Generation(object):
             The probability for the mutation to be replaced a random gate with a random new one. The chance of
             mutating by changing a gate connection(s) is (1-probability).
         """
-
-
-        # update the parent list with the chromosomes having the best fitness
         self.set_parent_list()
+        new_chromosome_list = []
 
-        # clear the current generation and add the parent chromosomes to it
-        self._chromosome_list.clear()
-        self._chromosome_list = self._parent_list.copy()
+        # add elite chromosomes to the chromosome list
+        for elite_chromosome in self._parent_list:
+            new_chromosome_list.append(elite_chromosome)
 
+        # create new chromosomes using parent selection and mutation
         probability_list = self.find_fitness_proportionate_probabilities()
         probability_list.reverse()
 
-        while len(self._chromosome_list) < self._chromosomes:
-
+        while len(new_chromosome_list) < self._chromosomes:
             mutated_chromosome = self.select_parent(probability_list)
             mutated_chromosome.mutate_chromosome(probability)
+            new_chromosome_list.append(mutated_chromosome)
 
-            self._chromosome_list.append(mutated_chromosome)
-        
+        self._chromosome_list = new_chromosome_list
+
+    def set_parent_list(self) -> None:
+        """Finds the four best chromosomes, and adds them to parent_list"""
+        sorted_chromosomes = sorted(self._chromosome_list, key=lambda c: np.mean(np.abs(c.get_fitness_score())), reverse=True)
+        self._parent_list = sorted_chromosomes[:4]
+
     '''def evolve_into_next_generation(self, probability=30):
         """
     Changes the chromosomes in the generation by "evolving" them is this manner:
@@ -112,41 +129,9 @@ class Generation(object):
 
             self._chromosome_list.append(mutated_chromosome)
         '''
-    '''def evolve_into_next_generation(self, probability=30):
-        """
-    Changes the chromosomes in the generation by "evolving" them is this manner:
-    The four best chromosomes are left unchanged as "elites". the rest of the chromosomes are
-    evolved with the mutate_chromosome() function.
 
-    Parameters
-    ----------
-    [Optional] probability (int)
-        The probability for the mutation to be replaced a random gate with a random new one. The chance of
-        mutating by changing a gate connection(s) is (1-probability).
-    """
-        self.set_parent_list()
-        probability_list = self.find_fitness_proportionate_probabilities()
-        probability_list.reverse()
 
-        new_chromosome_list = self._parent_list.copy()
 
-        while len(new_chromosome_list) < self._chromosomes:
-
-            mutated_chromosome = self.select_parent(probability_list)
-            mutated_chromosome.mutate_chromosome(probability)
-
-            new_chromosome_list.append(mutated_chromosome)
-
-        self._chromosome_list = new_chromosome_list.copy()
-         '''
-
-    def set_parent_list(self) -> None:
-        """Finds the four best chromosomes, and adds them to parent_list"""
-        parent_list = self._chromosome_list.copy()
-        parent_list.sort()
-        self._parent_list.clear()
-        self._parent_list = parent_list[:4]
-        print("Selected parents: ", self._parent_list)
 
     def find_fitness_proportionate_probabilities(self) -> List[float]:
         """
@@ -159,9 +144,9 @@ class Generation(object):
         """
         fitness_sum = 0
         for parent in self._parent_list:
-            fitness_sum = fitness_sum + parent.get_fitness_score() 
+            fitness_sum = fitness_sum + parent.get_fitness_score()
 
-        if math.isinf(fitness_sum):  
+        if np.isinf(fitness_sum).any():
             fitness_sum = 100
 
         selection_list = []
@@ -194,49 +179,65 @@ class Generation(object):
         for prob in probability_list:
             total_probability = total_probability + prob
 
-            if probability < total_probability:
+            if np.any(probability < total_probability):
                 parent = self._parent_list[index]
                 return copy.deepcopy(parent)
             index = index + 1
 
-    def run_generation(self, states: np.ndarray)->None:
-        """
-        Runs the simulator for all the chromosomes in the generation and
-        stores the fitness for each chromosome in fitness_list.
-
-        Parameters
-        ----------
-        states:  (List[float]):
-            A list of the eight entanglement measure we wish to test the chromosomes against.
-        """
+    #def run_generation(self, states: np.ndarray)->None:
+    def run_generation(self, target_entanglement: List[float]) -> None:
+        circuit_list = []  # added line
+        circuit_fitness_list = []  # added line
 
         for chromosome in self._chromosome_list:
             circuit = Circuit(chromosome)
-            ##chromosome_fitness = abs(circuit.find_chromosome_fitness(desired_entanglement))   ##original
-            chromosome_fitness = abs(circuit.find_chromosome_fitness(states))
-            chromosome.set_fitness_score(chromosome_fitness)
+            circuit.generate_circuit()
+            fitness = circuit.find_chromosome_fitness(target_entanglement)
+            circuit_list.append(circuit)  # added line
+            circuit_fitness_list.append(fitness)  # added line
+            chromosome.set_fitness_score(fitness)
+        self._circuit_list.append(circuit_list)  # added line
+        self._circuit_fitness_list.append(circuit_fitness_list)  # added line
 
+    def get_circuit_list(self, generation_index: int) -> List[Circuit]:
+        return self._circuit_list[generation_index]
 
+    def get_circuit_fitness_list(self, generation_index: int) -> List[float]:
+        return self._circuit_fitness_list[generation_index]
 
+    def get_best_fitness(self) -> float:
+        """
+        Returns the fitness of the best chromosome in the generation.
 
-    def get_best_fitness(self):
-        """Returns the fitness value for the best chromosome in the generation."""
-        best_fitness = 100
+        Returns
+        -------
+        best_fitness (float)
+            The fitness of the best chromosome in the generation.
+        """
+        best_fitness = float("inf")
         for chromosome in self._chromosome_list:
-            chromosome_fitness = chromosome.get_fitness_score() 
-            if best_fitness > chromosome_fitness:
-                best_fitness = chromosome_fitness
-
+            chromosome_fitness = abs(chromosome.get_fitness_score())
+            if np.mean(chromosome_fitness) < best_fitness:
+                best_fitness = np.mean(chromosome_fitness)
         return best_fitness
 
-    def get_best_chromosome(self):
-        """Returns the chromosome with the best fitness in the generation."""
+    def get_best_chromosome(self) -> Chromosome:
+        """
+        Returns the best chromosome in the generation.
+
+        Returns
+        -------
+        best_chromosome (Chromosome)
+            The best chromosome in the generation.
+        """
+        best_fitness = float("inf")
+        best_chromosome = None
         for chromosome in self._chromosome_list:
-            best_fitness = self. get_best_fitness()
-            if chromosome.get_fitness_score() == best_fitness:
-                return chromosome
-            else:
-                continue
+            chromosome_fitness = abs(chromosome.get_fitness_score()).mean()
+            if chromosome_fitness < best_fitness:
+                best_fitness = chromosome_fitness
+                best_chromosome = chromosome
+        return best_chromosome
 
     def print_chromosomes(self):
         """Prints all the generation's chromosomes."""

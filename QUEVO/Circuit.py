@@ -5,11 +5,16 @@ from qiskit.visualization import circuit_drawer
 from scipy.special import comb
 import itertools
 import typing
+import qiskit.quantum_info as qi
 import numpy as np
 from typing import List
-from qiskit import QuantumCircuit, Aer, assemble
+from qiskit import QuantumCircuit, Aer, assemble, execute
 from scipy.special import rel_entr
 from .Chromosome import Chromosome
+from qiskit.quantum_info import Statevector
+from qiskit.providers.aer import StatevectorSimulator
+
+
 
 
 class Circuit(object):
@@ -27,7 +32,6 @@ class Circuit(object):
     _STARTING_STATES (List[list]):
         a list of all possible starting states for the 3 qubits.
     """
-
     def __init__(self, chromosome: Chromosome):
         """
         Circuit constructor. Takes a chromosome as parameter, and creates a Qiskit
@@ -38,20 +42,23 @@ class Circuit(object):
         chromosome: (Chromosome)
             The chromosome that describes the QuantumCircuit.
          """
+
         n_qubits = 3
-        n_states = 8        
         self.chromosome = chromosome
         self._circuit = QuantumCircuit(n_qubits, 1) #three qubits and 1 classical bit
-        self._SHOTS = 2048
+        self._SHOTS = 2096
 
   
-        self._STARTING_STATES = np.random.rand(n_states, 2**n_qubits)
+        #self._STARTING_STATES = np.random.rand(n_states, 2**n_qubits)
+        self._STARTING_STATES = [[0, 0, 0],
+                                 [0, 0, 1],
+                                 [0, 1, 0],
+                                 [0, 1, 1],
+                                 [1, 0, 0],
+                                 [1, 0, 1],
+                                 [1, 1, 0],
+                                 [1, 1, 1]]
         self.results = {}
-
-
-    def __repr__(self):
-        """Returns a string visualizing the quantum _circuit"""
-        return self.draw()
 
     def generate_circuit(self) -> None:
 
@@ -107,87 +114,45 @@ class Circuit(object):
             else:
                 print(gate + " is not a valid gate!")
 
-        self._circuit.measure(0, 0) 
+        self._circuit.measure(0, 0)
 
 
-    def compute_MW_entanglement(self, ket):
+
+    def find_chromosome_fitness(self, target_entanglement) -> float:
+        backend = Aer.get_backend('statevector_simulator')
+        job = execute(self._circuit, backend)
+        result = job.result()
+        statevector = result.get_statevector()
+
+        entanglement = self.compute_MW_entanglement(statevector)
+        fitness = abs(entanglement - target_entanglement)
+
+        return fitness
+
+
+    def compute_MW_entanglement(self, statevector: np.ndarray) -> float:
         """
         Compute the Mayer-Wallach measure of entanglement.
-        
+
         Parameters:
         -----------
         ket : numpy.ndarray or list
             Vector of amplitudes in 2**N dimensions
-        
+
         Returns:
         --------
         MW_entanglement : float
             Mayer-Wallach entanglement value for the input ket
         """
         n_qubits = 3
-        ket = qutip.Qobj(ket, dims=[[2]*(n_qubits), [2]*(n_qubits)]).unit()
-        entanglement_sum = 2
+        ket = np.reshape(statevector, [2] * n_qubits)  # Reshape the statevector to a tensor
+        entanglement_sum = 1
         for k in range(n_qubits):
-            rho_k_sq = ket.ptrace([k])**2
-            entanglement_sum += rho_k_sq.tr()
-   
-        MW_entanglement = 2*(1 - (1/n_qubits)*entanglement_sum)
-        return MW_entanglement
+            rho_k_sq = np.abs(np.trace(np.transpose(ket, axes=np.roll(range(n_qubits), -k))))
+            entanglement_sum += rho_k_sq
 
-    def find_chromosome_fitness(self, state: List[int]) -> float:
-        """
-        Compute the fitness of a chromosome by computing the average Mayer-Wallach
-        entanglement for all the starting states.
-        
-        Parameters:
-        -----------
-        state : list
-            A binary string of length 3 representing the state of the qubits
-            
-        Returns:
-        --------
-        avg_MW_entanglement : float
-            The average Mayer-Wallach entanglement for all starting states
-        """
-
-        self.generate_circuit()
-
-        MW_entanglement_values = []
-        fitness = 0
-        MW_entanglement = self.compute_MW_entanglement(ket=state)
-        print('MW_entanglement = {}\n'.format(MW_entanglement))
-        fitness = fitness + MW_entanglement
-        return fitness
- 
-    '''@staticmethod
-    def scott_helper(state, perms):
-        """Helper function for entanglement measure. It gives trace of the output state"""
-        dems = np.linalg.matrix_power(
-            [partial_trace(state, list(qb)).data for qb in perms], 2
-        )
-        trace = np.trace(dems, axis1=1, axis2=2)
-        return np.sum(trace).real
-
-    def find_chromosome_fitness(self, states):
-        r"""Returns the meyer-wallach entanglement measure for the given circuit.
-
-        .. math::
-            Q = \frac{2}{|\vec{\theta}|}\sum_{\theta_{i}\in \vec{\theta}}
-            \Bigg(1-\frac{1}{n}\sum_{k=1}^{n}Tr(\rho_{k}^{2}(\theta_{i}))\Bigg)
-
-        """
-        fitness = 0
-        permutations = list(itertools.combinations(range(3), 3 - 1))
-        ns = 2 * sum(
-            [
-                1 - 1 / 3 * self.scott_helper(state, permutations)
-                for state in states
-            ]
-        )
-        return ns.real
-        fitness = 0 + ns.real
-        print('MW_entanglement = {}\n'.format(ns))
-        return fitness'''
+        entanglement = 1 * (1 - (1 / n_qubits) * entanglement_sum)
+        return entanglement
 
     def run_simulator(self) -> dict:
         """

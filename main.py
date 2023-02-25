@@ -1,40 +1,29 @@
 import qutip
+from qiskit import QuantumCircuit
 import numpy as np
 import QUEVO
+from math import ceil
 import itertools
 if __name__ == '__main__':
     #mutation_prob = 10
-    n_qubits = 3
-    n_states = 8
-    number_of_runs = 10
-    gates = 10
-    chromosomes = 20
-    generations = 10
+    number_of_runs = 100
+    gates = 5
+    chromosomes = 40
+    generations = 20
     gate_types = ['cx', 'x', 'h', 'rxx', 'rzz', 'swap', 'z', 'y', 'toffoli']
-    states = np.random.rand(n_states, 2**n_qubits)
-    #states = list(itertools.product(qubit_states, repeat=3))
-    '''For n_states = 8 and n_qubits = 3, the above code will create
-       a 2D numpy array with 8 rows and 2^3=8 columns, where each element 
-       in the array is a random number between 0 and 1. Eg.
-       [[0.16248639, 0.43624932, 0.51693115, 0.76832434, 0.70870195, 0.47029482, 0.04004524, 0.39170316],
-       [0.12674473, 0.7255842 , 0.36640728, 0.81731192, 0.72618788, 0.7491775 , 0.64095472, 0.03906416],
-       [0.58217411, 0.10484563, 0.88036448, 0.25417107, 0.56672723, 0.81278999, 0.89182192, 0.30158468],
-       [0.40554661, 0.67279258, 0.98864606, 0.43253257, 0.96366368, 0.22205014, 0.11458701, 0.90781098],
-       [0.56837468, 0.5898366 , 0.30850198, 0.47076449, 0.87769243, 0.14045381, 0.68710867, 0.36902781],
-       [0.15074584, 0.86403677, 0.59870491, 0.2342205 , 0.53060639, 0.77072021, 0.59867769, 0.73537197],
-       [0.76457804, 0.30510915, 0.14162209, 0.3195406 , 0.19285752, 0.93230133, 0.91168392, 0.60262369],
-       [0.3564249 , 0.32999487, 0.52168684, 0.92656499, 0.30701791, 0.33491614, 0.24813214, 0.20212784]])
-     '''
+    target_entanglement = [0.999999,0.999999]
 
 
 # Generate initial generation of chromosomes
 
     # Generate initial generation of chromosomes
 
-    generation = QUEVO.Generation(chromosomes, gates)
+    generation = QUEVO.Generation(chromosomes, gates, mutation_rate=0.02)
     generation.create_initial_generation(gate_types)
     #generation.run_generation(meyer_wallach_measure)
-    generation.run_generation(states)
+    generation.run_generation(target_entanglement)
+
+
 
     print("Fitness for best chromosome: " + str(generation.get_best_fitness()) + "\n"
           + "Selected parents: \n")
@@ -52,9 +41,15 @@ if __name__ == '__main__':
         # Mutate next generation of chromosomes
         generation.evolve_into_next_generation()
         # Check every Chromosome's fitness
-        generation.run_generation(states)
+        generation.run_generation(target_entanglement)
         current_fitness = generation.get_best_fitness()
         current_chromosome = generation.get_best_chromosome()
+
+        mean_fitness = np.mean(current_fitness)
+        max_fitness = np.max(current_fitness)
+        std_fitness = np.std(current_fitness)
+
+        print("Best fitness = " + str(max_fitness))
 
         # Print generation best result
         print("Fitness for best mutated circuit " + str(gen + 1) + ": "
@@ -81,6 +76,13 @@ if __name__ == '__main__':
     best_chromosome = generation.get_best_chromosome()
     print("Best fitness for generation", gen+1, ":", best_fitness)
     circuit = QUEVO.Circuit(best_chromosome)
+    '''circuit_list = generation.get_circuit_list(gen)
+    for i, circuit in enumerate(circuit_list):
+        print(f"Circuit {i + 1} from generation {gen + 1}:")
+        circuit.draw()
+        print("\n")
+    print("\n")'''
+
     circuit.generate_circuit()
     circuit.draw()
 
