@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     # Generate initial generation of chromosomes
 
-    generation = QUEVO.Generation(chromosomes, gates, mutation_rate=0.02)
+    generation = QUEVO.Generation(chromosomes, gates)
     generation.create_initial_generation(gate_types)
     #generation.run_generation(meyer_wallach_measure)
     generation.run_generation(target_entanglement)
