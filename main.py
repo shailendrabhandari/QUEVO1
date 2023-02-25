@@ -2,6 +2,8 @@ import qutip
 from qiskit import QuantumCircuit
 import numpy as np
 import QUEVO
+from qiskit.visualization import circuit_drawer
+from matplotlib import pyplot as plt
 from math import ceil
 import itertools
 if __name__ == '__main__':
@@ -76,12 +78,11 @@ if __name__ == '__main__':
     best_chromosome = generation.get_best_chromosome()
     print("Best fitness for generation", gen+1, ":", best_fitness)
     circuit = QUEVO.Circuit(best_chromosome)
-    '''circuit_list = generation.get_circuit_list(gen)
+    circuit_list = generation.get_circuit_list(gen)
     for i, circuit in enumerate(circuit_list):
         print(f"Circuit {i + 1} from generation {gen + 1}:")
         circuit.draw()
-        print("\n")
-    print("\n")'''
+    print("\n")
 
     circuit.generate_circuit()
     circuit.draw()
