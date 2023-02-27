@@ -117,15 +117,13 @@ class Circuit(object):
         self._circuit.measure(0, 0)
 
 
+
     def find_chromosome_fitness(self, target_entanglement) -> float:
         backend = Aer.get_backend('statevector_simulator')
         job = execute(self._circuit, backend)
         result = job.result()
         statevector = result.get_statevector()
-        #print(statevector)  #quantum representation state as a ket,
-        #which is a column vector of complex number. The ket has
-        # eight elements, which correspond to the probability
-        # amplitudes of an 3-qubit quantum state.
+
         entanglement = self.compute_MW_entanglement(statevector)
         fitness = abs(entanglement - target_entanglement)
 
@@ -147,17 +145,14 @@ class Circuit(object):
             Mayer-Wallach entanglement value for the input ket
         """
         n_qubits = 3
-        statevector = np.reshape(statevector, [2] * n_qubits)  # Reshape the statevector to a tensor
-        #print(statevector)##density matrix
-        entanglement_sum = 0
+        ket = np.reshape(statevector, [2] * n_qubits)  # Reshape the statevector to a tensor
+        entanglement_sum = 1
         for k in range(n_qubits):
-            rho_k_sq = np.abs(np.trace(np.transpose(statevector, axes=np.roll(range(n_qubits), -k)))**2)
+            rho_k_sq = np.abs(np.trace(np.transpose(ket, axes=np.roll(range(n_qubits), -k))))
             entanglement_sum += rho_k_sq
 
         entanglement = 1 * (1 - (1 / n_qubits) * entanglement_sum)
-
         return entanglement
-
 
     def run_simulator(self) -> dict:
         """
