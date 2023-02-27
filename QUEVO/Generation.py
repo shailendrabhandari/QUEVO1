@@ -25,7 +25,7 @@ class Generation(object):
         Number of gates in each chromosome.
     """
 
-    def __init__(self, chromosomes: int, gates: int) -> None:
+    def __init__(self, chromosomes: int, gates: int, mutation_rate: float) -> None:
         """
         The Generation constructor.
 
@@ -40,7 +40,7 @@ class Generation(object):
         self._parent_list: List[Chromosome] = []
         self._chromosomes: int = chromosomes
         self._gates: int = gates
-        #self.mutation_rate: float = mutation_rate
+        self.mutation_rate: float = mutation_rate
 
 
 
@@ -48,7 +48,7 @@ class Generation(object):
         self._parent_chromosomes = []
         self._circuit_list = []  # added line
         self._circuit_fitness_list = []  # added line
-        #self._mutation_rate = mutation_rate
+        self._mutation_rate = mutation_rate
         self._best_fitness = None
         self._best_chromosome = None
 
