@@ -10,7 +10,7 @@ This code was originally created for a pilot project conducted by the [NordSTAR]
 
 ## General info
 This code is creating quantum circuits for use with cellular automata. It uses an evolutionary algorithm to create quantum circuits with Qiskit. 
-feel free to open the notebook [Example project](https://github.com/Overskott/Evolving-quantum-circuits/blob/main/Example%20project.ipynb) to try it out with some instructions.
+feel free to open the notebook [Example project](https://github.com/shailendrabhandari/QUEVO1/blob/main/Example%20project.ipynb) to try it out with some instructions.
 
 
 Here we will describe the basics of how the quantum gate representation as a list of integers works, and a bit of how the package is intended.
@@ -59,7 +59,7 @@ Some gates (RZZ, RXX) also need an angle value (theta (0, 2pi)), which are autom
 
 ## User guide
 
-I will again suggest taking a look at the notebook [Example project](https://github.com/Overskott/Evolving-quantum-circuits/blob/main/Example%20project.ipynb).
+I will again suggest taking a look at the notebook [Example project](https://github.com/shailendrabhandari/QUEVO1/blob/main/Example%20project.ipynb).
 
 If you want to learn more in detail about all the functions, please read the docstrings.
 
