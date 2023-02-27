@@ -1,32 +1,17 @@
-import qutip
-from qiskit import QuantumCircuit
-import numpy as np
 import QUEVO
-from qiskit.visualization import circuit_drawer
-from matplotlib import pyplot as plt
-from math import ceil
-import itertools
 if __name__ == '__main__':
-    #mutation_prob = 10
-    number_of_runs = 100
-    gates = 5
-    chromosomes = 40
+    gates = 10
+    chromosomes = 20
     generations = 20
-    gate_types = ['cx', 'x', 'h', 'rxx', 'rzz', 'swap', 'z', 'y', 'toffoli']
-    target_entanglement = [0.999999,0.999999]
+    gate_types = ['cx', 'x', 'z', 'y', 'h', 'rxx', 'rzz', 'swap', 'toffoli']
+    target_entanglement = [0.9999999999]
 
 
 # Generate initial generation of chromosomes
-
-    # Generate initial generation of chromosomes
-
     generation = QUEVO.Generation(chromosomes, gates)
     generation.create_initial_generation(gate_types)
     #generation.run_generation(meyer_wallach_measure)
     generation.run_generation(target_entanglement)
-
-
-
     print("Fitness for best chromosome: " + str(generation.get_best_fitness()) + "\n"
           + "Selected parents: \n")
     generation.print_parents()
@@ -47,14 +32,8 @@ if __name__ == '__main__':
         current_fitness = generation.get_best_fitness()
         current_chromosome = generation.get_best_chromosome()
 
-        mean_fitness = np.mean(current_fitness)
-        max_fitness = np.max(current_fitness)
-        std_fitness = np.std(current_fitness)
-
-        print("Best fitness = " + str(max_fitness))
-
         # Print generation best result
-        print("Fitness for best mutated circuit " + str(gen + 1) + ": "
+        print("Fitness for best mutated chromosome in generation" + str(gen + 1) + ": "
               + str(current_fitness) + "\n")
         generation.print_parents()
         print("------------------------------------------------------------------------------")
@@ -70,20 +49,9 @@ if __name__ == '__main__':
 
         if current_fitness < 0.0001:
             break
-    #print("Best fitness for the circuit: " + str(final_fitness))
-    print("Best chromosome : " + str(best_chromosome))
-    max_fitness = -1
-    for gen in range(0, generations):
-        best_fitness = generation.get_best_fitness()
-        if best_fitness > max_fitness:
-            max_fitness = best_fitness
-
-    print("Best fitness among all generations: ", max_fitness)
-
     # Print the best circuit and its fitness
     best_fitness = generation.get_best_fitness()
     best_chromosome = generation.get_best_chromosome()
-    print("Best fitness for generation", gen+1, ":", best_fitness)
     circuit = QUEVO.Circuit(best_chromosome)
     circuit_list = generation.get_circuit_list(gen)
     '''for i, circuit in enumerate(circuit_list):
@@ -93,5 +61,4 @@ if __name__ == '__main__':
 
     circuit.generate_circuit()
     circuit.draw()
-
 
