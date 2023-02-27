@@ -62,9 +62,9 @@ class Generation(object):
             chromosome.generate_random_chromosome(self._gates)
             self._chromosome_list.append(chromosome)
         # Print the generated chromosomes
-        print("Initial Generation Parents:")
-        for chromosome in self._chromosome_list:
-            print(chromosome)
+        #print("Initial Generation Parents:")
+        '''for chromosome in self._chromosome_list:
+            print(chromosome)'''
 
     def evolve_into_next_generation(self, probability=5):
         """
