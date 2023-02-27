@@ -70,19 +70,26 @@ if __name__ == '__main__':
 
         if current_fitness < 0.0001:
             break
-    print("Best fitness for the circuit: " + str(final_fitness))
+    #print("Best fitness for the circuit: " + str(final_fitness))
     print("Best chromosome : " + str(best_chromosome))
+    max_fitness = -1
+    for gen in range(0, generations):
+        best_fitness = generation.get_best_fitness()
+        if best_fitness > max_fitness:
+            max_fitness = best_fitness
 
-# Print the best circuit and its fitness
+    print("Best fitness among all generations: ", max_fitness)
+
+    # Print the best circuit and its fitness
     best_fitness = generation.get_best_fitness()
     best_chromosome = generation.get_best_chromosome()
     print("Best fitness for generation", gen+1, ":", best_fitness)
     circuit = QUEVO.Circuit(best_chromosome)
     circuit_list = generation.get_circuit_list(gen)
-    for i, circuit in enumerate(circuit_list):
+    '''for i, circuit in enumerate(circuit_list):
         print(f"Circuit {i + 1} from generation {gen + 1}:")
         circuit.draw()
-    print("\n")
+    print("\n")'''
 
     circuit.generate_circuit()
     circuit.draw()
