@@ -29,9 +29,18 @@ Stores several chromosomes. It can populate itself with a given number of genera
 Handles the parsing from integer list to circuit and initialising Qiskit code to simulate the circuits.
 
 ### Quantum circuit as a list of integers
-The circuit is represented as a list of integers, where each gate is represented  of a group three successive integers. The first group will be the first gate in the circuit, the second the secnd gate and so on.
+Quantum computing is a rapidly developing field that has great potential to revolutionize the way we process information. It uses quantum mechanics principles to perform computations that are not possible on classical computers.
 
-The first integer denotes what kind of gate it is (i.e. X-gate, CNOT, Hadamard). Which integer that corresponds to which gate is changed dynamically based on what gates you provide in the code, and the table is automatiically generated each run. The second integer describes to which qubit is this gate assigned to (0 -> qubit 0, 1 -> qubit 1, ...). The third integer is describing which qubit is controlling the gate. in cases where gates do not have anexternal controller, this int is ignored. 
+One way to represent a quantum circuit is to use a list of integers, where each group of three successive integers represents a gate. The first integer in the group denotes the type of gate, the second integer represents the qubit to which the gate is applied, and the third integer represents the qubit that controls the gate.
+
+For example, a Pauli-X gate on qubit 0 can be represented by the list [1, 0, 0], where 1 corresponds to the X-gate. A CNOT gate with control qubit 0 and target qubit 1 can be represented by the list [2, 1, 0]. A Hadamard gate on qubit 2 can be represented by the list [3, 2, 0].
+
+The correspondence between integers and gates is determined dynamically based on the gates provided in the code, and a table is automatically generated each time the code is run.
+
+It's worth noting that not all gates have a control qubit, and in those cases, the third integer in the group is ignored.
+
+Using a list of integers to represent a quantum circuit can be useful for various purposes, such as circuit visualization, circuit optimization, and circuit compilation. However, it's important to keep in mind that this is just one of many possible representations of a quantum circuit, and different representations may be more suitable for different applications.
+
 
 Here's an example:
 
