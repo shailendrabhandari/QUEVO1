@@ -66,7 +66,7 @@ class Generation(object):
         '''for chromosome in self._chromosome_list:
             print(chromosome)'''
 
-    def evolve_into_next_generation(self, probability=5):
+    def evolve_into_next_generation(self, probability=0.05):
         """
         Changes the chromosomes in the generation by "evolving" them is this manner:
         The four best chromosomes are left unchanged as "elites". the rest of the chromosomes are
@@ -97,55 +97,6 @@ class Generation(object):
 
         self._chromosome_list = new_chromosome_list
 
-        '''def evolve_into_next_generation(self, probability=10, crossover_probability=50):
-        """
-        Changes the chromosomes in the generation by "evolving" them is this manner:
-        The four best chromosomes are left unchanged as "elites". the rest of the chromosomes are
-        evolved with the crossover_chromosome() and mutate_chromosome() functions.
-
-        Parameters
-        ----------
-        [Optional] probability (int)
-            The probability for the mutation to be replaced a random gate with a random new one. The chance of
-            mutating by changing a gate connection(s) is (1-probability).
-        [Optional] crossover_probability (int)
-            The probability for performing crossover between two parent chromosomes.
-        """
-        self.set_parent_list()
-        new_chromosome_list = []
-
-        # add elite chromosomes to the chromosome list
-        for elite_chromosome in self._parent_list:
-            new_chromosome_list.append(elite_chromosome)
-
-        # create new chromosomes using parent selection and crossover
-        probability_list = self.find_fitness_proportionate_probabilities()
-        probability_list.reverse()
-
-        while len(new_chromosome_list) < self._chromosomes:
-            parent1 = self.select_parent(probability_list)
-            parent2 = self.select_parent(probability_list)
-
-            # Perform crossover
-            if random.randint(0, 100) < crossover_probability:
-                k = random.randint(1, self._gates - 2)
-                offspring1 = Chromosome(parent1._gate_types)
-                offspring2 = Chromosome(parent2._gate_types)
-                offspring1.set_genes(parent1.get_genes()[:k] + parent2.get_genes()[k:])
-                offspring2.set_genes(parent2.get_genes()[:k] + parent1.get_genes()[k:])
-            else:
-                offspring1 = copy.deepcopy(parent1)
-                offspring2 = copy.deepcopy(parent2)
-
-            # Mutate offspring
-            offspring1.mutate_chromosome(probability)
-            offspring2.mutate_chromosome(probability)
-
-            new_chromosome_list.append(offspring1)
-            if len(new_chromosome_list) < self._chromosomes:
-                new_chromosome_list.append(offspring2)
-
-        self._chromosome_list = new_chromosome_list'''
 
     def set_parent_list(self) -> None:
         """Finds the four best chromosomes, and adds them to parent_list"""
@@ -236,8 +187,8 @@ class Generation(object):
         best_fitness = float("inf")
         for chromosome in self._chromosome_list:
             chromosome_fitness = abs(chromosome.get_fitness_score())
-            if np.mean(chromosome_fitness) < best_fitness:
-                best_fitness = np.mean(chromosome_fitness)
+            if np.max(chromosome_fitness) < best_fitness:
+                best_fitness = np.max(chromosome_fitness)
         return best_fitness
 
     def get_best_chromosome(self) -> Chromosome:
@@ -252,7 +203,7 @@ class Generation(object):
         best_fitness = float("inf")
         best_chromosome = None
         for chromosome in self._chromosome_list:
-            chromosome_fitness = abs(chromosome.get_fitness_score()).mean()
+            chromosome_fitness = abs(chromosome.get_fitness_score()).max()
             if chromosome_fitness < best_fitness:
                 best_fitness = chromosome_fitness
                 best_chromosome = chromosome

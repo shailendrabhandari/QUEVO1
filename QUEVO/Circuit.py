@@ -122,9 +122,11 @@ class Circuit(object):
         job = execute(self._circuit, backend)
         result = job.result()
         statevector = result.get_statevector()
-        #print(statevector)
+        #print(statevector)  #quantum representation state as a ket,
+        #which is a column vector of complex number. The ket has
+        # eight elements, which correspond to the probability
+        # amplitudes of an 3-qubit quantum state.
         entanglement = self.compute_MW_entanglement(statevector)
-        #print(entanglement)
         fitness = abs(entanglement - target_entanglement)
 
         return fitness
@@ -145,14 +147,17 @@ class Circuit(object):
             Mayer-Wallach entanglement value for the input ket
         """
         n_qubits = 3
-        ket = np.reshape(statevector, [2] * n_qubits)  # Reshape the statevector to a tensor
-        entanglement_sum = 1
+        statevector = np.reshape(statevector, [2] * n_qubits)  # Reshape the statevector to a tensor
+        #print(statevector)##density matrix
+        entanglement_sum = 0
         for k in range(n_qubits):
-            rho_k_sq = np.abs(np.trace(np.transpose(ket, axes=np.roll(range(n_qubits), -k))))
+            rho_k_sq = np.abs(np.trace(np.transpose(statevector, axes=np.roll(range(n_qubits), -k)))**2)
             entanglement_sum += rho_k_sq
 
         entanglement = 1 * (1 - (1 / n_qubits) * entanglement_sum)
+
         return entanglement
+
 
     def run_simulator(self) -> dict:
         """

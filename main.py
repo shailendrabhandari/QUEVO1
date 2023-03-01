@@ -1,10 +1,10 @@
 import QUEVO
 if __name__ == '__main__':
-    gates = 10
+    gates = 3
     chromosomes = 20
-    generations = 20
+    generations = 30
     gate_types = ['cx', 'x', 'z', 'y', 'h', 'rxx', 'rzz', 'swap', 'toffoli']
-    target_entanglement = [0.9999999999]
+    target_entanglement = [0.9999999999999996]
 
 
 # Generate initial generation of chromosomes
@@ -54,10 +54,10 @@ if __name__ == '__main__':
     best_chromosome = generation.get_best_chromosome()
     circuit = QUEVO.Circuit(best_chromosome)
     circuit_list = generation.get_circuit_list(gen)
-    '''for i, circuit in enumerate(circuit_list):
+    for i, circuit in enumerate(circuit_list):
         print(f"Circuit {i + 1} from generation {gen + 1}:")
         circuit.draw()
-    print("\n")'''
+    print("\n")
 
     circuit.generate_circuit()
     circuit.draw()
