@@ -25,7 +25,7 @@ class Generation(object):
         Number of gates in each chromosome.
     """
 
-    def __init__(self, chromosomes: int, gates: int, mutation_rate: float) -> None:
+    def __init__(self, chromosomes: int, gates: int) -> None:
         """
         The Generation constructor.
 
@@ -36,21 +36,17 @@ class Generation(object):
         gates (int):
             Number of gates in each chromosome.
         """
+        self._chromosome_list = []
         self._chromosome_list: List[Chromosome] = []
         self._parent_list: List[Chromosome] = []
         self._chromosomes: int = chromosomes
         self._gates: int = gates
-        self.mutation_rate: float = mutation_rate
-
-
-
-        self._chromosome_list = []
         self._parent_chromosomes = []
         self._circuit_list = []  # added line
         self._circuit_fitness_list = []  # added line
-        self._mutation_rate = mutation_rate
         self._best_fitness = None
         self._best_chromosome = None
+
 
     def create_initial_generation(self, gate_types: List[str]) -> None:
         """
@@ -61,9 +57,9 @@ class Generation(object):
             chromosome = Chromosome(gate_types)
             chromosome.generate_random_chromosome(self._gates)
             self._chromosome_list.append(chromosome)
-        # Print the generated chromosomes
-        #print("Initial Generation Parents:")
-        '''for chromosome in self._chromosome_list:
+        '''# Print the generated chromosomes
+        print("Initial Generation Parents:")
+        for chromosome in self._chromosome_list:
             print(chromosome)'''
 
     def evolve_into_next_generation(self, probability=0.05):
@@ -169,6 +165,7 @@ class Generation(object):
         self._circuit_list.append(circuit_list)  # added line
         self._circuit_fitness_list.append(circuit_fitness_list)  # added line
 
+
     def get_circuit_list(self, generation_index: int) -> List[Circuit]:
         return self._circuit_list[generation_index]
 
@@ -257,7 +254,4 @@ class Generation(object):
         for chromosome in self._chromosome_list:
             print(chromosome.get_fitness_score())
         print("\n")
-
-
-
 

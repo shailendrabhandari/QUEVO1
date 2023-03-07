@@ -1,4 +1,3 @@
-
 import qutip
 from qiskit.quantum_info import partial_trace
 from qiskit.visualization import circuit_drawer
@@ -15,9 +14,8 @@ from qiskit.quantum_info import Statevector
 from qiskit.providers.aer import StatevectorSimulator
 
 
-
-
 class Circuit(object):
+    n_qubits = 5
     """
     A qiskit QuantumCircuit made from a chromosome.
 
@@ -32,6 +30,7 @@ class Circuit(object):
     _STARTING_STATES (List[list]):
         a list of all possible starting states for the 3 qubits.
     """
+
     def __init__(self, chromosome: Chromosome):
         """
         Circuit constructor. Takes a chromosome as parameter, and creates a Qiskit
@@ -43,43 +42,43 @@ class Circuit(object):
             The chromosome that describes the QuantumCircuit.
          """
 
-        n_qubits = 3
+        self._statevector = None
+        self._fitness = None  # added line
         self.chromosome = chromosome
-        self._circuit = QuantumCircuit(n_qubits, 1) #three qubits and 1 classical bit
-        self._SHOTS = 2096
+        self._circuit = QuantumCircuit(self.n_qubits, 1)  # three qubits and 1 classical bit
+        self._SHOTS = 8192
 
-  
-        #self._STARTING_STATES = np.random.rand(n_states, 2**n_qubits)
-        self._STARTING_STATES = [[0, 0, 0],
-                                 [0, 0, 1],
-                                 [0, 1, 0],
-                                 [0, 1, 1],
-                                 [1, 0, 0],
-                                 [1, 0, 1],
-                                 [1, 1, 0],
-                                 [1, 1, 1]]
+        # self._STARTING_STATES = np.random.rand(n_states, 2**n_qubits)
+
+        states = []
+        for i in range(2 ** self.n_qubits):
+            state = []
+            for j in range(self.n_qubits):
+                state.append((i // (2 ** j)) % 2)
+            states.append(state)
+        self._STARTING_STATES = states
+
+        # print(self._STARTING_STATES)
+
         self.results = {}
 
     def generate_circuit(self) -> None:
-
-        
         """
         Parses the chromosome, and generates a Qiskit QuantumCircuit from it.
 
-	The generate_circuit method generates a Qiskit quantum circuit from a chromosome object.
-	The chromosome object has a list of integers and a dictionary that maps the integers to different
-	quantum gates, such as 'h', 'cx', 'x', 'swap', 'rzz', 'rxx', 'toffoli', 'y', and 'z'. The method
-	 creates a circuit by iterating through the integer list in steps of 3 and using each group of 3
-	 integers to determine which gate to apply, to which qubits, and with what parameters. The method then
-	 adds the chosen gate to the circuit. Finally, it adds a measurement gate to the first
-	 qubit and outputs qubit 0.
+        The generate_circuit method generates a Qiskit quantum circuit from a chromosome object.
+        The chromosome object has a list of integers and a dictionary that maps the integers to different
+        quantum gates, such as 'h', 'cx', 'x', 'swap', 'rzz', 'rxx', 'toffoli', 'y', and 'z'. The method
+         creates a circuit by iterating through the integer list in steps of 3 and using each group of 3
+         integers to determine which gate to apply, to which qubits, and with what parameters. The method then
+         adds the chosen gate to the circuit. Finally, it adds a measurement gate to the first
+         qubit and outputs qubit 0.
         """
-        n_qubits = 3
-        gates = int(self.chromosome.get_length() / n_qubits)
+        gates = int(self.chromosome.get_length() / self.n_qubits)
         gate_dict = self.chromosome.get_gate_dict()
 
         for i in range(0, gates):
-            gate_index = i * n_qubits
+            gate_index = i * self.n_qubits
 
             a = self.chromosome.get_integer_list()[gate_index]
             b = self.chromosome.get_integer_list()[gate_index + 1]
@@ -116,19 +115,29 @@ class Circuit(object):
 
         self._circuit.measure(0, 0)
 
+        self._circuit.measure(0, 0)
 
+    def get_statevector(self) -> np.ndarray:
+        if self._statevector is None:
+            backend = Aer.get_backend('statevector_simulator')
+            job = execute(self._circuit, backend)
+            result = job.result()
+            self._statevector = result.get_statevector(self._circuit)
+        return self._statevector
 
     def find_chromosome_fitness(self, target_entanglement) -> float:
         backend = Aer.get_backend('statevector_simulator')
         job = execute(self._circuit, backend)
         result = job.result()
         statevector = result.get_statevector()
-
+        # print(statevector)  #quantum representation state as a ket,
+        # which is a column vector of complex number. The ket has
+        # eight elements, which correspond to the probability
+        # amplitudes of an 3-qubit quantum state.
         entanglement = self.compute_MW_entanglement(statevector)
         fitness = abs(entanglement - target_entanglement)
 
         return fitness
-
 
     def compute_MW_entanglement(self, statevector: np.ndarray) -> float:
         """
@@ -144,15 +153,26 @@ class Circuit(object):
         MW_entanglement : float
             Mayer-Wallach entanglement value for the input ket
         """
-        n_qubits = 3
-        ket = np.reshape(statevector, [2] * n_qubits)  # Reshape the statevector to a tensor
-        entanglement_sum = 1
-        for k in range(n_qubits):
-            rho_k_sq = np.abs(np.trace(np.transpose(ket, axes=np.roll(range(n_qubits), -k))))
+
+        statevector = np.reshape(statevector, [2] * self.n_qubits)  # Reshape the statevector to a tensor
+        # print(statevector)##density matrix
+        entanglement_sum = 0
+        for k in range(self.n_qubits):
+            rho_k_sq = np.abs(np.trace(np.transpose(statevector, axes=np.roll(range(self.n_qubits), -k))) ** 2)
             entanglement_sum += rho_k_sq
 
-        entanglement = 1 * (1 - (1 / n_qubits) * entanglement_sum)
+        entanglement = 1 * (1 - (1 / self.n_qubits) * entanglement_sum)
+
         return entanglement
+
+    def set_fitness(self, fitness: float) -> None:
+        self._fitness = fitness
+
+    def get_fitness(self) -> float:
+        if self._fitness is None:
+            return 0
+        else:
+            return self._fitness
 
     def run_simulator(self) -> dict:
         """

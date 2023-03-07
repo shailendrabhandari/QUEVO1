@@ -7,6 +7,7 @@ from typing import List
 
 
 class Chromosome(object):
+    n_qubits=5
     """
     A class used to represent a quantum computer _circuit as a list of integers.
 
@@ -137,10 +138,10 @@ class Chromosome(object):
     def _generate_theta_list(self) -> None:
         """Generates a list of angles based on the current list of integers"""
         self._theta_list.clear()
-        gates = int(self._length / 3)
+        gates = int(self._length / self.n_qubits)
 
         for i in range(0, gates):
-            int_index = i * 3
+            int_index = i * self.n_qubits
             gate = self._gate_dict[str(self._integer_list[int_index])]
             if gate in ['rzz', 'rxx']:
                 theta = random.uniform(0, 2 * math.pi)
@@ -161,11 +162,11 @@ class Chromosome(object):
         new_list : List[int]
             The new_list list with one or more changed integers.
         """
-        gates = int(self._length / 3)
+        gates = int(self._length / self.n_qubits)
         change_list = self._change_in_theta(old_list, new_list)
 
         for i in range(0, gates):
-            int_index = i * 3
+            int_index = i * self.n_qubits
             gate = self._gate_dict[str(self._integer_list[int_index])]
             if change_list[i] == 1 and gate in ['rzz', 'rxx']:
                 theta = random.uniform(0, 2 * math.pi)
@@ -211,7 +212,7 @@ class Chromosome(object):
     def generate_random_chromosome(self, gates: int) -> None:
         """
         Generates a random list of integers representing a quantum _circuit with
-        the parameter "gates" number of gates
+        the parameter "gates" number of gates for a 5-qubit circuit.
 
         Parameters
         ----------
@@ -220,11 +221,12 @@ class Chromosome(object):
         """
 
         self.clear()
-        for i in range(gates * 3):
-            if i % 3 == 0:
-                self._integer_list.append(random.randrange(0, len(self._gate_types)))
+        gate_types = ['h', 'cx', 'x', 'swap', 'rzz', 'rxx', 'toffoli', 'y', 'z']
+        for i in range(gates * self.n_qubits):
+            if i % self.n_qubits == 0:
+                self._integer_list.append(random.randrange(0, len(gate_types)))
             else:
-                self._integer_list.append(random.randrange(0, 3))
+                self._integer_list.append(random.randrange(0, self.n_qubits))
 
         self._update_length()
         self._fix_duplicate_qubit_assignment()
@@ -251,7 +253,7 @@ class Chromosome(object):
         old_integer_list = copy.copy(self._integer_list)
 
         if random.random() < probability:
-            self._replace_gate_with_random_gate()
+            self._replace_gate_with_random_gate(self.n_qubits)
         else:
             self._change_qubit_connections()
         self._fix_duplicate_qubit_assignment()
@@ -260,20 +262,22 @@ class Chromosome(object):
         mutated_chromosome = copy.deepcopy(self)
         return mutated_chromosome
 
-    def _replace_gate_with_random_gate(self) -> None:
+    def _replace_gate_with_random_gate(self, n_qubits: int) -> None:
         """
         Randomly selects a gate from the pool of all gates in the chromosome, and replaces it with a randomly generated new one.
         """
-        random_index = random.randrange(0, int(self._length/3)) * 3
+        random_index = random.randrange(0, int(self._length / self.n_qubits)) * self.n_qubits
+        while self._integer_list[random_index + 1] >= self.n_qubits or self._integer_list[random_index + 2] >= self.n_qubits:
+            random_index = random.randrange(0, int(self._length / self.n_qubits)) * self.n_qubits
 
         self._integer_list[random_index] = random.randrange(0, len(self._gate_types))
-        self._integer_list[random_index + 1] = random.randrange(0, 3) #(0, len(self._gate_types))
-        self._integer_list[random_index + 2] = random.randrange(0, 3) #(0, len(self._gate_types))
+        self._integer_list[random_index + 1] = random.randrange(0, n_qubits)
+        self._integer_list[random_index + 2] = random.randrange(0, n_qubits)
 
     @DeprecationWarning
     def _replace_with_random_chromosome(self) -> None:
         """Clears the chromosome and randomly generates a new _integer_list"""
-        gates = int(self._length/3)
+        gates = int(self._length/self.n_qubits)
         self.clear()
         self.generate_random_chromosome(gates)
 
@@ -283,16 +287,24 @@ class Chromosome(object):
         and both target and control for multiple qubit gates
         """
 
-        random_index = random.randrange(0, int(self._length / 3)) * 3
+        random_index = random.randrange(0, int(self._length / self.n_qubits)) * self.n_qubits
 
         original_connection_1 = self._integer_list[random_index + 1]
-        original_connection_2 = self._integer_list[random_index + 2]
+        original_connection_2 = self._integer_list[random_index + 2]  ##upto 3 qubits
+        original_connection_3 = self._integer_list[random_index + 3] ####upto 4 qubits
+        original_connection_4 = self._integer_list[random_index + 4]  ##upto 5 qubits
 
         while original_connection_1 == self._integer_list[random_index + 1]:
-            self._integer_list[random_index + 1] = random.randrange(0, 3)
+            self._integer_list[random_index + 1] = random.randrange(0, self.n_qubits)
 
         while original_connection_2 == self._integer_list[random_index + 2]:
-            self._integer_list[random_index + 2] = random.randrange(0, 3)
+            self._integer_list[random_index + 2] = random.randrange(0, self.n_qubits) ##upto 3 qubits
+
+        while original_connection_3 == self._integer_list[random_index + 3]:
+            self._integer_list[random_index + 3] = random.randrange(0, self.n_qubits) ##upto 4 qubits
+
+        while original_connection_4 == self._integer_list[random_index + 4]:
+            self._integer_list[random_index + 4] = random.randrange(0, self.n_qubits)  ##upto 5 qubits
 
     def _fix_duplicate_qubit_assignment(self) -> None:
         """
@@ -300,22 +312,25 @@ class Chromosome(object):
         If the gate has an invalid connection (it is connected to itself through the randomly generated integers),
         it generates a valid configuration randomly.
         """
-        gates = int(self._length / 3)
+        gates = int(self._length / self.n_qubits)
 
         for i in range(0, gates):
-            int_index = i * 3
+            int_index = i * self.n_qubits
 
             if ((self._gate_dict[str(self._integer_list[int_index])] in ['cx', 'swap', 'rzz', 'rxx']) and
                     self._integer_list[int_index + 1] == self._integer_list[int_index + 2]):
+                invalid_qubit = self._integer_list[int_index + 1]
 
-                if self._integer_list[int_index + 1] == 0:
-                    self._integer_list[int_index + 1] = random.randrange(1, 3)
+                if invalid_qubit == 0:
+                    self._integer_list[int_index + 1] = random.randrange(1, self.n_qubits)
+                elif invalid_qubit == self.n_qubits - 1:
+                    self._integer_list[int_index + 1] = random.randrange(0, self.n_qubits - 1)
+                else:
+                    self._integer_list[int_index + 1] = random.choice(
+                        [random.randrange(0, invalid_qubit), random.randrange(invalid_qubit + 1, self.n_qubits)])
 
-                elif self._integer_list[int_index + 1] == 1:
-                    self._integer_list[int_index + 2] = 0
-
-                elif self._integer_list[int_index + 1] == 2:
-                    self._integer_list[int_index + 2] = random.randrange(0, 2)
+                self._integer_list[int_index + 2] = random.choice(
+                    [x for x in range(self.n_qubits) if x != self._integer_list[int_index + 1]])
 
 
 
