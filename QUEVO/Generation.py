@@ -62,7 +62,7 @@ class Generation(object):
         for chromosome in self._chromosome_list:
             print(chromosome)'''
 
-    def evolve_into_next_generation(self, probability=0.05):
+    def evolve_into_next_generation(self, probability=0.10):
         """
         Changes the chromosomes in the generation by "evolving" them is this manner:
         The four best chromosomes are left unchanged as "elites". the rest of the chromosomes are
@@ -165,12 +165,10 @@ class Generation(object):
         self._circuit_list.append(circuit_list)  # added line
         self._circuit_fitness_list.append(circuit_fitness_list)  # added line
 
-
     def get_circuit_list(self, generation_index: int) -> List[Circuit]:
         return self._circuit_list[generation_index]
 
-    def get_circuit_fitness_list(self, generation_index: int) -> List[float]:
-        return self._circuit_fitness_list[generation_index]
+
 
     def get_best_fitness(self) -> float:
         """

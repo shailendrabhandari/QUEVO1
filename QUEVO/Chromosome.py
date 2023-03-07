@@ -304,7 +304,7 @@ class Chromosome(object):
             self._integer_list[random_index + 3] = random.randrange(0, self.n_qubits) ##upto 4 qubits
 
         while original_connection_4 == self._integer_list[random_index + 4]:
-            self._integer_list[random_index + 4] = random.randrange(0, self.n_qubits)'''  ##upto 5 qubits
+            self._integer_list[random_index + 4] = random.randrange(0, self.n_qubits)''' ##upto 5 qubits
 
     def _fix_duplicate_qubit_assignment(self) -> None:
         """

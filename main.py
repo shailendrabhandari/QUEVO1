@@ -1,9 +1,10 @@
 import QUEVO
 import numpy as np
 if __name__ == '__main__':
-    gates = 3
+    n_qubits =3
+    gates = 5
     chromosomes = 20
-    generations = 10
+    generations = 2
     gate_types = ['cx', 'x', 'z', 'y', 'h', 'rxx', 'rzz', 'swap', 'toffoli']
     target_entanglement = [0.9999999999999996]
 
@@ -59,22 +60,39 @@ if __name__ == '__main__':
     circuit = QUEVO.Circuit(best_chromosome)
     circuit_list = generation.get_circuit_list(gen)
     for i, circuit in enumerate(circuit_list):
-        print(f"Circuit from generation {i + 1} ")
+        print(f"Circuit from parents {i+1}")
         circuit.draw()
     print("\n")
 
+
  # Check if there is a new best chromosome
-    if best_circuit_entanglement is None or current_fitness > best_circuit_entanglement:
+    if best_circuit_entanglement is None or best_fitness > best_circuit_entanglement:
         # Store the best circuit state vector and entanglement
-        best_circuit = QUEVO.Circuit(current_chromosome)
+        best_circuit = QUEVO.Circuit(best_chromosome)
         best_circuit.generate_circuit()
         best_circuit_state_vector = best_circuit.get_statevector()
-        best_circuit_entanglement = current_fitness
+        best_circuit_entanglement = best_fitness
 
-    # Print the best circuit and its fitness
-    print("Best circuit entanglement:", best_circuit_entanglement)
+    # Print the best circuit
+    print("Best circuit:", best_circuit_entanglement)
     best_circuit.draw()
 
     # Print the state vector of the best circuit
     print("State vector of the best circuit:")
     print(best_circuit_state_vector)
+
+    # Compute the value of rho_k_sq for the best circuit
+    state_vector = best_circuit.get_statevector()
+    state_vector = np.reshape(state_vector, [2] * n_qubits)
+
+    entanglement_sum = 0
+    for k in range(best_circuit.n_qubits):
+        rho_k_sq = np.abs(
+            np.trace(np.transpose(state_vector, axes=np.roll(range(best_circuit.n_qubits), -k))) ** 2)
+        entanglement_sum += rho_k_sq
+
+    entanglement = 1 * (1 - (1 / best_circuit.n_qubits) * entanglement_sum)
+
+    # Print the value of rho_k_sq for the best circuit
+    print("Value of reduced density matrix for the best circuit:", rho_k_sq)
+    print(entanglement)

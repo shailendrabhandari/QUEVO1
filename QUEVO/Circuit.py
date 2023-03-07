@@ -115,14 +115,13 @@ class Circuit(object):
 
         self._circuit.measure(0, 0)
 
-        self._circuit.measure(0, 0)
-
     def get_statevector(self) -> np.ndarray:
         if self._statevector is None:
             backend = Aer.get_backend('statevector_simulator')
             job = execute(self._circuit, backend)
             result = job.result()
             self._statevector = result.get_statevector(self._circuit)
+        #self._statevector = np.reshape(self._statevector, [2] * self.n_qubits)
         return self._statevector
 
     def find_chromosome_fitness(self, target_entanglement) -> float:
@@ -159,6 +158,7 @@ class Circuit(object):
         entanglement_sum = 0
         for k in range(self.n_qubits):
             rho_k_sq = np.abs(np.trace(np.transpose(statevector, axes=np.roll(range(self.n_qubits), -k))) ** 2)
+            #print(rho_k_sq)
             entanglement_sum += rho_k_sq
 
         entanglement = 1 * (1 - (1 / self.n_qubits) * entanglement_sum)
