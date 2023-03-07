@@ -7,7 +7,7 @@ from typing import List
 
 
 class Chromosome(object):
-    n_qubits=5
+    n_qubits=3
     """
     A class used to represent a quantum computer _circuit as a list of integers.
 
@@ -291,8 +291,8 @@ class Chromosome(object):
 
         original_connection_1 = self._integer_list[random_index + 1]
         original_connection_2 = self._integer_list[random_index + 2]  ##upto 3 qubits
-        original_connection_3 = self._integer_list[random_index + 3] ####upto 4 qubits
-        original_connection_4 = self._integer_list[random_index + 4]  ##upto 5 qubits
+        #original_connection_3 = self._integer_list[random_index + 3] ####upto 4 qubits
+        #original_connection_4 = self._integer_list[random_index + 4]  ##upto 5 qubits
 
         while original_connection_1 == self._integer_list[random_index + 1]:
             self._integer_list[random_index + 1] = random.randrange(0, self.n_qubits)
@@ -300,11 +300,11 @@ class Chromosome(object):
         while original_connection_2 == self._integer_list[random_index + 2]:
             self._integer_list[random_index + 2] = random.randrange(0, self.n_qubits) ##upto 3 qubits
 
-        while original_connection_3 == self._integer_list[random_index + 3]:
+        '''while original_connection_3 == self._integer_list[random_index + 3]:
             self._integer_list[random_index + 3] = random.randrange(0, self.n_qubits) ##upto 4 qubits
 
         while original_connection_4 == self._integer_list[random_index + 4]:
-            self._integer_list[random_index + 4] = random.randrange(0, self.n_qubits)  ##upto 5 qubits
+            self._integer_list[random_index + 4] = random.randrange(0, self.n_qubits)'''  ##upto 5 qubits
 
     def _fix_duplicate_qubit_assignment(self) -> None:
         """

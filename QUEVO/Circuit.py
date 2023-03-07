@@ -15,7 +15,7 @@ from qiskit.providers.aer import StatevectorSimulator
 
 
 class Circuit(object):
-    n_qubits = 5
+    n_qubits = 3
     """
     A qiskit QuantumCircuit made from a chromosome.
 

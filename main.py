@@ -1,7 +1,7 @@
 import QUEVO
 import numpy as np
 if __name__ == '__main__':
-    gates = 5
+    gates = 3
     chromosomes = 20
     generations = 10
     gate_types = ['cx', 'x', 'z', 'y', 'h', 'rxx', 'rzz', 'swap', 'toffoli']
