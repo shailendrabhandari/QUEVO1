@@ -9,8 +9,11 @@ This code was originally created for a pilot project conducted by the [NordSTAR]
 * [Setup](#setup)
 
 ## General info
-This code is creating quantum circuits for use with cellular automata. It uses an evolutionary algorithm to create quantum circuits with Qiskit. 
-feel free to open the notebook [Example project](https://github.com/shailendrabhandari/QUEVO1/blob/main/Example%20project.ipynb) to try it out with some instructions.
+The QUEVO1 framework utilizes an evolutionary algorithm to automatically generate quantum circuits that satisfy defined properties specified through a fitness function. The parameters of evolution can be controlled by adjusting factors such as the initial population, number of generations, probability of mutation operator, number of gates in the circuit, and the chosen fitness function.
+
+This code creates quantum circuits using the Qiskit framework and measures the entangling capability of the circuits using the MW (Meyer-Wallach) entanglement measure. The MW entanglement measure is a measure of entanglement between qubits in a quantum system. The higher the value of the MW measure (which ranges from 0 to 1), the more entangled the system is.
+
+If you wish to experiment with the framework, you can access the Example project notebook at the following link: https://github.com/shailendrabhandari/QUEVO1/blob/main/Example%20project.ipynb. The notebook provides instructions on how to use the framework and test its functionality.
 
 
 Here we will describe the basics of how the quantum gate representation as a list of integers works, and a bit of how the package is intended.
