@@ -43,6 +43,7 @@ class Circuit(object):
          """
 
         self._statevector = None
+        self._partial_trace = None
         self._fitness = None  # added line
         self.chromosome = chromosome
         self._circuit = QuantumCircuit(self.n_qubits, 1)  # three qubits and 1 classical bit
@@ -51,11 +52,15 @@ class Circuit(object):
         # self._STARTING_STATES = np.random.rand(n_states, 2**n_qubits)
 
         states = []
-        for i in range(2 ** self.n_qubits):
+        for i in range(2 ** self.n_qubits):  # Loop over all possible decimal numbers from 0 to 2^n_qubits - 1
             state = []
-            for j in range(self.n_qubits):
+            for j in range(self.n_qubits):  # Loop over all qubit positions
+                # Convert the decimal number to its binary representation
+                # (i // (2 ** j)) % 2 gives the binary digit at position j
                 state.append((i // (2 ** j)) % 2)
-            states.append(state)
+            states.append(state)  # Add the binary state to the list of states
+
+        # Store the list of all possible binary states in the _STARTING_STATES attribute
         self._STARTING_STATES = states
 
         # print(self._STARTING_STATES)
@@ -123,50 +128,50 @@ class Circuit(object):
             job = execute(self._circuit, backend)
             result = job.result()
             self._statevector = result.get_statevector(self._circuit)
-        #self._statevector = np.reshape(self._statevector, [2] * self.n_qubits)
+            self._statevector = self._statevector / np.linalg.norm(self._statevector)
         return self._statevector
 
     def find_chromosome_fitness(self) -> float:
-        backend = Aer.get_backend('statevector_simulator')
-        job = execute(self._circuit, backend)
-        result = job.result()
-        statevector = result.get_statevector()
-        normalized_statevector = statevector / np.linalg.norm(statevector)  # normalization
-        #print(statevector)  #quantum representation state as a ket,
-        # which is a column vector of complex number. The ket has
-        # eight elements, which correspond to the probability
-        # amplitudes of an 3-qubit quantum state.
+        statevector = self.get_statevector()
+        normalized_statevector = statevector / np.linalg.norm(statevector)
         entanglement = self.compute_MW_entanglement(normalized_statevector)
         fitness = abs(entanglement)
 
         return fitness
 
+    def partial_trace(self, matrix, keep):
+        matrix = np.asarray(matrix)
+        keep_indices = list(range(0, len(keep)))
+
+        trace_over_indices = [i for i in range(self.n_qubits) if i not in keep_indices]
+
+        reshaped_dimensions = [2] * self.n_qubits * 2
+        matrix = matrix.reshape(reshaped_dimensions)
+
+        for index in sorted(trace_over_indices, reverse=True):
+            axis2 = index + len(trace_over_indices)
+            matrix = np.trace(matrix, axis1=index, axis2=axis2)
+
+        return matrix
     def compute_MW_entanglement(self, normalized_statevector: np.ndarray) -> float:
-        """
-        Compute the Mayer-Wallach measure of entanglement.
 
-        Parameters:
-        -----------
-        ket : numpy.ndarray or list
-            Vector of amplitudes in 2**N dimensions
-
-        Returns:
-        --------
-        MW_entanglement : float
-            Mayer-Wallach entanglement value for the input ket
-        """
-
-        normalized_statevector = np.reshape(normalized_statevector, [2] * self.n_qubits)  # Reshape the statevector to a tensor
-        #print(statevector)##density matrix
+        normalized_statevector = np.reshape(normalized_statevector, [2] * self.n_qubits)
+        density_matrix = np.outer(normalized_statevector, normalized_statevector.conj())
         entanglement_sum = 0
+
         for k in range(self.n_qubits):
-            rho_k_sq = np.abs(np.trace(np.transpose(normalized_statevector, axes=np.roll(range(self.n_qubits), -k))) ** 2)
+            keep = [k] * 2
+            rho_k = self.partial_trace(density_matrix, keep)
+            print(rho_k)
+            rho_k_sq = np.abs(np.trace(rho_k @ rho_k))
             #print(rho_k_sq)
             entanglement_sum += rho_k_sq
 
         entanglement = 1 * (1 - (1 / self.n_qubits) * entanglement_sum)
-
         return entanglement
+
+    def set_fitness(self, fitness: float) -> None:
+        self._fitness = fitness
 
     def set_fitness(self, fitness: float) -> None:
         self._fitness = fitness

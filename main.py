@@ -80,20 +80,3 @@ if __name__ == '__main__':
     print("State vector of the best circuit:")
     print(best_circuit_state_vector)
 
-    # Compute the value of rho_k_sq for the best circuit
-    state_vector = best_circuit.get_statevector()
-    state_vector = np.reshape(state_vector, [2] * n_qubits)
-
-    entanglement_sum = 0
-    for k in range(4):
-        rho_k_sq = np.abs(
-            np.trace(np.transpose(state_vector, axes=np.roll(range(best_circuit.n_qubits), -k))) ** 2)
-        print(rho_k_sq)
-        entanglement_sum += rho_k_sq
-
-
-    entanglement = 1 * (1 - (1 / best_circuit.n_qubits) * entanglement_sum)
-
-    # Print the value of rho_k_sq for the best circuit
-
-    print(entanglement)
