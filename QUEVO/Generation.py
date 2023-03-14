@@ -66,7 +66,7 @@ class Generation(object):
         """
         Changes the chromosomes in the generation by "evolving" them is this manner:
         The four best chromosomes are left unchanged as "elites". the rest of the chromosomes are
-        evolved with the mutate_chromosome() function.
+        evolved with the mutate_chromosome() function
 
         Parameters
         ----------
@@ -151,14 +151,14 @@ class Generation(object):
             index = index + 1
 
     #def run_generation(self, states: np.ndarray)->None:
-    def run_generation(self, target_entanglement: List[float]) -> None:
+    def run_generation(self) -> None:
         circuit_list = []  # added line
         circuit_fitness_list = []  # added line
 
         for chromosome in self._chromosome_list:
             circuit = Circuit(chromosome)
             circuit.generate_circuit()
-            fitness = circuit.find_chromosome_fitness(target_entanglement)
+            fitness = circuit.find_chromosome_fitness()
             circuit_list.append(circuit)  # added line
             circuit_fitness_list.append(fitness)  # added line
             chromosome.set_fitness_score(fitness)

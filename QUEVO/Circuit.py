@@ -15,7 +15,7 @@ from qiskit.providers.aer import StatevectorSimulator
 
 
 class Circuit(object):
-    n_qubits = 3
+    n_qubits = 5
     """
     A qiskit QuantumCircuit made from a chromosome.
 
@@ -114,6 +114,8 @@ class Circuit(object):
                 print(gate + " is not a valid gate!")
 
         self._circuit.measure(0, 0)
+        #self._circuit.measure(1, 0)
+        #self._circuit.measure(2, 0)
 
     def get_statevector(self) -> np.ndarray:
         if self._statevector is None:
@@ -124,21 +126,22 @@ class Circuit(object):
         #self._statevector = np.reshape(self._statevector, [2] * self.n_qubits)
         return self._statevector
 
-    def find_chromosome_fitness(self, target_entanglement) -> float:
+    def find_chromosome_fitness(self) -> float:
         backend = Aer.get_backend('statevector_simulator')
         job = execute(self._circuit, backend)
         result = job.result()
         statevector = result.get_statevector()
-        # print(statevector)  #quantum representation state as a ket,
+        normalized_statevector = statevector / np.linalg.norm(statevector)  # normalization
+        #print(statevector)  #quantum representation state as a ket,
         # which is a column vector of complex number. The ket has
         # eight elements, which correspond to the probability
         # amplitudes of an 3-qubit quantum state.
-        entanglement = self.compute_MW_entanglement(statevector)
-        fitness = abs(entanglement - target_entanglement)
+        entanglement = self.compute_MW_entanglement(normalized_statevector)
+        fitness = abs(entanglement)
 
         return fitness
 
-    def compute_MW_entanglement(self, statevector: np.ndarray) -> float:
+    def compute_MW_entanglement(self, normalized_statevector: np.ndarray) -> float:
         """
         Compute the Mayer-Wallach measure of entanglement.
 
@@ -153,11 +156,11 @@ class Circuit(object):
             Mayer-Wallach entanglement value for the input ket
         """
 
-        statevector = np.reshape(statevector, [2] * self.n_qubits)  # Reshape the statevector to a tensor
-        # print(statevector)##density matrix
+        normalized_statevector = np.reshape(normalized_statevector, [2] * self.n_qubits)  # Reshape the statevector to a tensor
+        #print(statevector)##density matrix
         entanglement_sum = 0
         for k in range(self.n_qubits):
-            rho_k_sq = np.abs(np.trace(np.transpose(statevector, axes=np.roll(range(self.n_qubits), -k))) ** 2)
+            rho_k_sq = np.abs(np.trace(np.transpose(normalized_statevector, axes=np.roll(range(self.n_qubits), -k))) ** 2)
             #print(rho_k_sq)
             entanglement_sum += rho_k_sq
 
