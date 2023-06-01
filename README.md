@@ -84,3 +84,18 @@ Project is created with:
 
 ## Setup
 This project uses Qiskit and scipy. The best way of installing qiskit is by using pip: `$ pip install qiskit` and `$ pip install scipy`
+
+## Publication
+Bhandari, S., Nichele, S., Denysov, S., & Lind, P. G. (2023). Evolutionary
+Computing to Solve Optimal Entangle States in Quantum Circuits.EasyChair
+Preprint no. 10135. Submitted: QCE2023
+Preprint available at: https://easychair.org/publications/preprint/bgdS
+
+## Bibtex citation
+BibTeX does not have the right entry for preprints. This is a hack for producing the correct reference:
+@Booklet{EasyChair:10135,
+  author = {Shailendra Bhandari and Stefano Nichele and Sergiy Denysov and Pedro G. Lind},
+  title = {Evolutionary Computing to Solve Optimal Entangle States in Quantum Circuits},
+  howpublished = {EasyChair Preprint no. 10135},
+
+  year = {EasyChair, 2023}}
