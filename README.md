@@ -1,4 +1,4 @@
-# QUEVO1
+# QUEVO1: Evolutionary Computing for Quantum Circuit Generation and Entanglement Measurement
 
 This code was originally created for a pilot project conducted by the [NordSTAR](https://www.oslomet.no/nordstar) research group at Oslo Metropolitan University. Its main purpose was to generate simulated quantum circuits to achieve a desired probability outcome for eight initial conditions. However, it has been further modified to include the measurement of entanglement in the generated quantum circuits using MW-measure of entanglement methods.
 
