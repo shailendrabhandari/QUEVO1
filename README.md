@@ -1,5 +1,9 @@
 # 🌟 QUEVO1: Evolutionary Computing for Quantum Circuit Generation and Entanglement Measurement 🌟
 
+[![preprint](https://img.shields.io/static/v1?label=arXiv&message=2307.11494&color=B31B1B)](https://doi.org/10.48550/arXiv.2408.00448)
+[![License: MIT](https://img.shields.io/badge/License-Apache--2.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0)
+
+
 This code was originally created for a pilot project conducted by the [NordSTAR](https://www.oslomet.no/nordstar) research group at Oslo Metropolitan University. Its main purpose was to generate simulated quantum circuits to achieve a desired probability outcome for eight initial conditions. However, it has been further modified to include the measurement of entanglement in the generated quantum circuits using MW-measure of entanglement methods.
 
 ## 📜 Table of Contents
