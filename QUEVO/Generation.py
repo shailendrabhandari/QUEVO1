@@ -163,7 +163,7 @@ class Generation(object):
             index = index + 1
 
     #def run_generation(self, states: np.ndarray)->None:
-    def run_generation(self) -> None:
+    def run_generation(self, target_entangelement) -> None:
         circuit_list = []  # added line
         circuit_fitness_list = []  # added line
 
@@ -171,11 +171,11 @@ class Generation(object):
             circuit = Circuit(chromosome)
             circuit.generate_circuit()
             fitness = circuit.find_chromosome_fitness()
-            circuit_list.append(circuit)  # added line
-            circuit_fitness_list.append(fitness)  # added line
+            circuit_list.append(circuit)  
+            circuit_fitness_list.append(fitness)  
             chromosome.set_fitness_score(fitness)
-        self._circuit_list.append(circuit_list)  # added line
-        self._circuit_fitness_list.append(circuit_fitness_list)  # added line
+        self._circuit_list.append(circuit_list)  
+        self._circuit_fitness_list.append(circuit_fitness_list)  
 
     def get_circuit_list(self, generation_index: int) -> List[Circuit]:
         return self._circuit_list[generation_index]
